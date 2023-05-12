@@ -52,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(ItemDto itemDto, long itemId, long userId) {
-        Item newItem  = itemMapper.toItem(itemDto);
+        Item newItem = itemMapper.toItem(itemDto);
         validateUser(userId);
         Item oldItem = itemStorage.getItemById(itemId);
         validateItemOwner(oldItem, userId);

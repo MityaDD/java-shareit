@@ -41,9 +41,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto, Long id) {
-        userDto.setId(id);
-        return userMapper.toUserDto(userStorage.updateUser(userMapper.toUser(userDto)));
+    public UserDto updateUser(UserDto userDto, Long userId) {
+        userDto.setId(userId);
+        User userFromNewDTO = userMapper.toUser(userDto);
+        validateId(userId);
+        validateEmail(userFromNewDTO);
+        User userToBeUpdated = userStorage.getUserById(userId);
+        checkAndSetFields(userFromNewDTO, userToBeUpdated);
+        User updatedUser = userStorage.updateUser(userToBeUpdated);
+        return userMapper.toUserDto(updatedUser);
     }
 
     @Override
@@ -67,6 +73,15 @@ public class UserServiceImpl implements UserService {
                 .anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail())
                         && u.getId() != user.getId())) {
             Log.andThrowEmailConflict("Пользователь с таким email уже существует! " + user.getEmail());
+        }
+    }
+
+    private void checkAndSetFields(User userFromNewDTO, User userToBeUpdated) {
+        if (userFromNewDTO.getName() != null && !userFromNewDTO.getName().isEmpty()) {
+            userToBeUpdated.setName(userFromNewDTO.getName());
+        }
+        if (userFromNewDTO.getEmail() != null && !userFromNewDTO.getEmail().isEmpty()) {
+            userToBeUpdated.setEmail(userFromNewDTO.getEmail());
         }
     }
 }
