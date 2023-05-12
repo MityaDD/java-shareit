@@ -7,7 +7,6 @@ import ru.practicum.shareit.exception.NotValidException;
 
 @Slf4j
 public class Log {
-
     public static void andThrowNotValid(String message) {
         log.warn(message);
         throw new NotValidException(message);
