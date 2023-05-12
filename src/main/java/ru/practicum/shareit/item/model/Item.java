@@ -1,25 +1,35 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Data;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.User;
+import lombok.*;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.model.User;
 
-/**
- * TODO Sprint add-controllers.
- */
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Item {
-    private long id;
+    private Long id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
+    @NotNull
     private Boolean available;
     private User owner;
     private ItemRequest request;
 
-    public Item(String name, String description, Boolean available) {
-        this.name = name;
-        this.description = description;
-        this.available = available;
+    public Item(Item newItem) {
+        this.setId(newItem.getId());
+        this.setName(newItem.getName());
+        this.setDescription(newItem.getDescription());
+        this.setAvailable(newItem.getAvailable());
+        this.setOwner(newItem.getOwner());
+        this.setRequest(newItem.getRequest());
     }
+
+
 }
 
