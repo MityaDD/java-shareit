@@ -17,8 +17,12 @@ public class UserStorageImpl implements UserStorage {
 
     @Override
     public User getUserById(Long id) {
-        validateId(id);
         return users.get(id);
+    }
+
+    @Override
+    public Map<Long, User> getUsersMap() {
+        return users;
     }
 
     @Override
@@ -28,7 +32,6 @@ public class UserStorageImpl implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        validateEmail(user);
         user.setId(++increment);
         users.put(user.getId(), user);
         return users.get(user.getId());
