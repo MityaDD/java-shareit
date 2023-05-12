@@ -2,8 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.NotValidException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -54,11 +52,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(ItemDto itemDto, long itemId, long userId) {
-        Item item  = itemMapper.toItem(itemDto);
+        Item newItem  = itemMapper.toItem(itemDto);
         validateUser(userId);
         Item oldItem = itemStorage.getItemById(itemId);
-
-        itemOwnerNameDescAvailValidator(item, oldItem, userId);
+        validateItemOwner(oldItem, userId);
+        checkAndSetFields(newItem, oldItem);
         Item updatedItem = itemStorage.updateItem(oldItem);
         return itemMapper.toItemDto(updatedItem);
     }
@@ -91,7 +89,6 @@ public class ItemServiceImpl implements ItemService {
             Log.andThrowNotValid("Описание не должно быть пустым");
         }
     }
-// if (item.getName() != null || item.getName().isBlank()) ====== объединить
 
     private void validateUser(Long userId) {
         if (!userStorage.getAllUsers().contains(userStorage.getUserById(userId))) {
@@ -99,18 +96,21 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    private void itemOwnerNameDescAvailValidator(Item item, Item oldItem, long userId) {
-        if (oldItem.getOwner().getId() != userId) {
+    private void validateItemOwner(Item item, Long userId) {
+        if (item.getOwner().getId() != userId) {
             Log.andThrowNotFound("Пользователь не владеет этой вещью!");
         }
-        if (item.getName() != null) {
-            oldItem.setName(item.getName());
+    }
+
+    private void checkAndSetFields(Item newItem, Item oldItem) {
+        if (newItem.getName() != null) {
+            oldItem.setName(newItem.getName());
         }
-        if (item.getDescription() != null) {
-            oldItem.setDescription(item.getDescription());
+        if (newItem.getDescription() != null) {
+            oldItem.setDescription(newItem.getDescription());
         }
-        if (item.getAvailable() != null) {
-            oldItem.setAvailable(item.getAvailable());
+        if (newItem.getAvailable() != null) {
+            oldItem.setAvailable(newItem.getAvailable());
         }
     }
 
