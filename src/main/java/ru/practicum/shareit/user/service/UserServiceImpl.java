@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -20,12 +22,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
+        log.info("Запрошен пользователь с id={}", id);
         validateId(id);
         return userMapper.toUserDto(userStorage.getUserById(id));
     }
 
     @Override
     public Collection<UserDto> getAllUsers() {
+        log.info("Запрошен список всех пользователей");
         return userStorage.getAllUsers()
                 .stream()
                 .map(userMapper::toUserDto)
@@ -37,6 +41,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toUser(userDto);
         validateEmail(user);
         userStorage.addUser(user);
+        log.info("Добавлен новый пользователь: {}", user);
         return userMapper.toUserDto(user);
     }
 
@@ -49,12 +54,14 @@ public class UserServiceImpl implements UserService {
         User userToBeUpdated = userStorage.getUserById(userId);
         checkAndSetFields(userFromNewDTO, userToBeUpdated);
         User updatedUser = userStorage.updateUser(userToBeUpdated);
+        log.debug("Обновлен пользователь: {}", updatedUser);
         return userMapper.toUserDto(updatedUser);
     }
 
     @Override
-    public Boolean deleteUser(Long id) {
-        return userStorage.deleteUser(id);
+    public void deleteUser(Long id) {
+        userStorage.deleteUser(id);
+        log.debug("Обновлен пользователь с id={}", id);
     }
 
 
@@ -69,15 +76,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateEmail(User user) {
-        if (isEmailAlreadyRegistered(user)) {
-            Log.andThrowEmailConflict("Пользователь с таким email уже существует! " + user.getEmail());
+        String mail = user.getEmail();
+        if (isEmailAlreadyRegistered(mail, user.getId())) {
+            Log.andThrowEmailConflict("Пользователь с таким email уже существует! " + mail);
         }
     }
 
-    private boolean isEmailAlreadyRegistered(User user) {
+    private boolean isEmailAlreadyRegistered(String mail, Long userId) {
         return getUsersMap().values().stream()
-                .anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail())
-                        && u.getId() != user.getId());
+                .anyMatch(u -> u.getEmail().equalsIgnoreCase(mail)
+                        && u.getId() != userId);
     }
 
     private void checkAndSetFields(User userFromNewDTO, User userToBeUpdated) {

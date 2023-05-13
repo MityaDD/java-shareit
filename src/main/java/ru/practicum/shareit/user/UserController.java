@@ -17,19 +17,16 @@ public class UserController {
 
     @GetMapping("{id}")
     public UserDto getUserById(@PathVariable Long id) {
-
         return userService.getUserById(id);
     }
 
     @GetMapping
     public Collection<UserDto> getAllUsers() {
-
         return userService.getAllUsers();
     }
 
     @PostMapping
     public UserDto addUser(@Valid @RequestBody UserDto userDto) {
-
         return userService.addUser(userDto);
     }
 
@@ -41,7 +38,6 @@ public class UserController {
 
     @DeleteMapping("{id}")
     public void deleteUser(@PathVariable Long id) {
-
         userService.deleteUser(id);
     }
 }

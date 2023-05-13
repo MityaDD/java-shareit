@@ -13,5 +13,5 @@ public interface UserService {
 
     UserDto updateUser(UserDto userDto, Long id);
 
-    Boolean deleteUser(Long id);
+    void deleteUser(Long id);
 }
