@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -15,45 +13,38 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
-
-    private final String userIdHeader = "X-Sharer-User-Id";
-
+    private static final String HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @PostMapping()
-    public ResponseEntity<ItemDto> createItem(@Valid @RequestBody ItemDto itemDto,
-                                              @RequestHeader(userIdHeader) Long userId) {
-        ItemDto itemCreated = itemService.addItem(itemDto, userId);
-        return ResponseEntity.status(201).body(itemCreated);
+    public ItemDto createItem(@Valid @RequestBody ItemDto itemDto,
+                              @RequestHeader(HEADER) Long userId) {
+        return itemService.addItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
-                                              @RequestHeader(userIdHeader) Long userId) {
-        ItemDto itemUpdated = itemService.updateItem(itemDto, itemId, userId);
-        return ResponseEntity.ok().body(itemUpdated);
+    public ItemDto updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
+                              @RequestHeader(HEADER) Long userId) {
+        return itemService.updateItem(itemDto, itemId, userId);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Collection<ItemDto>> searchItems(@RequestParam(name = "text") String text) {
-        return ResponseEntity.ok().body(itemService.searchItemsByDescription(text));
+    public Collection<ItemDto> searchItems(@RequestParam(name = "text") String text) {
+        return itemService.searchItemsByDescription(text);
     }
 
     @DeleteMapping("/{itemId}")
-    public ResponseEntity<Void> removeItem(@PathVariable Long itemId) {
+    public void removeItem(@PathVariable Long itemId) {
         itemService.deleteItem(itemId);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getItem(@PathVariable Long itemId) {
-        ItemDto item = itemService.getItemById(itemId);
-        return ResponseEntity.ok().body(item);
+    public ItemDto getItem(@PathVariable Long itemId) {
+        return itemService.getItemById(itemId);
     }
 
     @GetMapping()
-    public ResponseEntity<List<ItemDto>> findAll(@RequestHeader(userIdHeader) Long userId) {
-        List<ItemDto> items = itemService.getAllItemsByUserId(userId);
-        return ResponseEntity.ok().body(items);
+    public List<ItemDto> findAll(@RequestHeader(HEADER) Long userId) {
+        return itemService.getAllItemsByUserId(userId);
     }
 }

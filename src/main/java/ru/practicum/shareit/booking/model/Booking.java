@@ -12,9 +12,9 @@ public class Booking {
     private long id;
     private LocalDateTime start;
     private LocalDateTime end;
-    @NotNull // или проверять?
+    @NotNull
     private Item item;
-    @NotNull // или проверять?
+    @NotNull
     private User booker;
     private Status status;
 }

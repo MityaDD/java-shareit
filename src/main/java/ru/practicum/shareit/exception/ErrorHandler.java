@@ -16,21 +16,21 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleNotValidExceptionHandler(NotValidException e) {
-        log.error("Неверный параметр: " + e.getMessage());
+        log.error("Неверный параметр: {}", e.getMessage());
         return Map.of("error", String.format("Неверный параметр %s", e.getMessage()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFoundExceptionHandler(NotFoundException e) {
-        log.error("Не найдено: " + e.getMessage());
+        log.error("Не найдено: {}", e.getMessage());
         return Map.of("error", String.format("Не найден %s", e.getMessage()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleEmailExceptionHandler(EmailException e) {
-        log.error("Ошибка: " + e.getMessage());
+        log.error("Ошибка: {}", e.getMessage());
         return Map.of("error", e.getMessage());
     }
 

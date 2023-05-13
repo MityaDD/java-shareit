@@ -69,11 +69,15 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateEmail(User user) {
-        if (getUsersMap().values().stream()
-                .anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail())
-                        && u.getId() != user.getId())) {
+        if (isEmailAlreadyRegistered(user)) {
             Log.andThrowEmailConflict("Пользователь с таким email уже существует! " + user.getEmail());
         }
+    }
+
+    private boolean isEmailAlreadyRegistered(User user) {
+        return getUsersMap().values().stream()
+                .anyMatch(u -> u.getEmail().equalsIgnoreCase(user.getEmail())
+                        && u.getId() != user.getId());
     }
 
     private void checkAndSetFields(User userFromNewDTO, User userToBeUpdated) {
@@ -85,4 +89,3 @@ public class UserServiceImpl implements UserService {
         }
     }
 }
-
