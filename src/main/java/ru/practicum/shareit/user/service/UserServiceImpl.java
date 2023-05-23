@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         userStorage.deleteUser(id);
-        log.debug("Обновлен пользователь с id={}", id);
+        log.debug("Удален пользователь с id={}", id);
     }
 
 
