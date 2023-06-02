@@ -10,28 +10,26 @@ import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
-@ResponseStatus(HttpStatus.BAD_REQUEST)
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler(NotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleNotValidExceptionHandler(NotValidException e) {
-        log.error("Неверный параметр: {}", e.getMessage());
-        return Map.of("error", String.format("Неверный параметр %s", e.getMessage()));
+    public ErrorResponse handleNotValidException(NotValidException e) {
+        log.error("Неверный параметр, {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundExceptionHandler(NotFoundException e) {
+    public Map<String, String> handleNotFoundException(NotFoundException e) {
         log.error("Не найдено: {}", e.getMessage());
         return Map.of("error", String.format("Не найден %s", e.getMessage()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleEmailExceptionHandler(EmailException e) {
+    public Map<String, String> handleEmailException(EmailException e) {
         log.error("Ошибка: {}", e.getMessage());
         return Map.of("error", e.getMessage());
     }
-
 }

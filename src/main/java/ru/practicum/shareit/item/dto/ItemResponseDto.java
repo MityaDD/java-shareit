@@ -1,40 +1,40 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.dto.BookingDtoSpecial;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.model.Comment;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "items")
-public class Item {
+public class ItemResponseDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
     private Long id;
 
     @NotBlank(message = "Имя не может быть пустым")
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
     @NotBlank(message = "Описание не может быть пустым")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    @ToString.Exclude
     private User owner;
 
-    @Column(name = "available")
     @NotNull(message = "Статус бронирования не может быть пустым")
     private Boolean available;
+
+    private BookingDtoSpecial lastBooking;
+
+    private BookingDtoSpecial nextBooking;
+
+    private List<Comment> comments;
 
 }

@@ -25,6 +25,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -92,8 +93,6 @@
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>
-
-
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

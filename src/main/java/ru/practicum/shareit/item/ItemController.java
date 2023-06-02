@@ -3,9 +3,12 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,15 +20,20 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping()
-    public ItemDto createItem(@Valid @RequestBody ItemDto itemDto,
-                              @RequestHeader(HEADER) Long userId) {
-        return itemService.addItem(itemDto, userId);
+    public ItemDto createItem(@RequestHeader(HEADER) Long userId,
+                              @Valid @RequestBody ItemDto itemDto) {
+        return itemService.addItem(userId, itemDto);
+    }
+
+    @GetMapping("/{itemId}")
+    public ItemResponseDto getItem(@PathVariable Long itemId, @RequestHeader(HEADER) @NotNull Long userId) {
+        return itemService.getItemById(itemId, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
-                              @RequestHeader(HEADER) Long userId) {
-        return itemService.updateItem(itemDto, itemId, userId);
+    public ItemDto updateItem(@RequestHeader(HEADER) Long userId, @PathVariable Long itemId,
+                              @RequestBody ItemDto itemDto) {
+        return itemService.updateItem(userId, itemId, itemDto);
     }
 
     @GetMapping("/search")
@@ -38,13 +46,15 @@ public class ItemController {
         itemService.deleteItem(itemId);
     }
 
-    @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable Long itemId) {
-        return itemService.getItemById(itemId);
+    @GetMapping()
+    public List<ItemResponseDto> findAll(@RequestHeader(HEADER) Long userId) {
+        return itemService.getAllItemsByUserId(userId);
     }
 
-    @GetMapping()
-    public List<ItemDto> findAll(@RequestHeader(HEADER) Long userId) {
-        return itemService.getAllItemsByUserId(userId);
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addCommentByItemId(@RequestHeader(HEADER) @NotNull Long userId,
+                                         @PathVariable("itemId") Long itemId,
+                                         @Valid @RequestBody CommentDto commentDto) {
+        return itemService.addComment(userId, itemId, commentDto);
     }
 }
