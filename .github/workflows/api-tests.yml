@@ -5,4 +5,4 @@ on:
 
 jobs:
   build:
-    uses: yandex-praktikum/java-shareit/.github/workflows/api-tests.yml@ciz
+    uses: yandex-praktikum/java-shareit/.github/workflows/api-tests.yml@ci
