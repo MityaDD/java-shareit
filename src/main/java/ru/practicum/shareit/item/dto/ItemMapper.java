@@ -78,7 +78,7 @@ public class ItemMapper {
                 .comments(comment)
                 .build();
     }
-
+    /*
     public static CommentDto toCommentDto(Comment comment, User author) {
         return CommentDto
                 .builder()
@@ -96,9 +96,8 @@ public class ItemMapper {
                 .text(dto.getText())
                 .item(item)
                 .build();
-    }
+    }*/
 
-    /*
     public static CommentDto toCommentDto(Comment comment, User author) {
         if (comment == null) {
             return null;
@@ -122,5 +121,5 @@ public class ItemMapper {
         comment.setItem(item);
         comment.setCreated(dto.getCreated());
         return comment;
-    } */
+    }
 }
