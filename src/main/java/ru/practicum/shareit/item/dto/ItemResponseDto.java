@@ -17,24 +17,15 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ItemResponseDto {
-
     private Long id;
-
-    @NotBlank(message = "Имя не может быть пустым")
+    @NotBlank
     private String name;
-
-    @NotBlank(message = "Описание не может быть пустым")
+    @NotBlank
     private String description;
-
     private User owner;
-
-    @NotNull(message = "Статус бронирования не может быть пустым")
+    @NotNull
     private Boolean available;
-
     private BookingDtoSpecial lastBooking;
-
     private BookingDtoSpecial nextBooking;
-
     private List<Comment> comments;
-
 }

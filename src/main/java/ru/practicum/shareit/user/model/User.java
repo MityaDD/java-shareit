@@ -16,19 +16,16 @@ import javax.validation.constraints.NotBlank;
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
-
     @Column(name = "name")
-    @NotBlank(message = "Имя не может быть пустым")
+    @NotBlank
     private String name;
-
     @Column(name = "email")
-    @NotBlank(message = "Email не может быть пустым")
-    @Email(message = "Электронная почта не может быть пустой и должна содержать символ @")
+    @NotBlank
+    @Email
     private String email;
 }
 

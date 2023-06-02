@@ -117,8 +117,10 @@ public class ItemServiceImpl implements ItemService {
         if (booking.isEmpty()) {
             Log.andThrowNotValid("Вы не можете оставить отзыв, т.к. не бронировали вещь");
         }
+
         User author = userService.getById(bookerId);
         Item item = getById(itemId);
+
         Comment comment = ItemMapper.toComment(commentDto, author, item);
         Comment commentSaved = commentStorage.save(comment);
         log.info("Добавлен новый комментарий к вещи id{}.", itemId);

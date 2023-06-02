@@ -41,7 +41,7 @@ public class ItemMapper {
         return item;
     }
 
-    public static ItemResponseDto toItemResponseDto(Item item, List<Booking> booking, List<Comment> comment) {
+    public static ItemResponseDto toItemResponseDto(Item item, List<Booking> booking, List<Comment> comments) {
         BookingDtoSpecial bookingLast = null;
         BookingDtoSpecial bookingNext = null;
         LocalDateTime time = LocalDateTime.now();
@@ -75,10 +75,10 @@ public class ItemMapper {
                 .available(item.getAvailable())
                 .lastBooking(bookingLast)
                 .nextBooking(bookingNext)
-                .comments(comment)
+                .comments(comments)
                 .build();
     }
-    /*
+
     public static CommentDto toCommentDto(Comment comment, User author) {
         return CommentDto
                 .builder()
@@ -96,30 +96,6 @@ public class ItemMapper {
                 .text(dto.getText())
                 .item(item)
                 .build();
-    }*/
 
-    public static CommentDto toCommentDto(Comment comment, User author) {
-        if (comment == null) {
-            return null;
-        }
-        CommentDto commentDto = new CommentDto();
-        commentDto.setId(comment.getId());
-        commentDto.setText(comment.getText());
-        commentDto.setAuthorName(author.getName());
-        commentDto.setCreated(comment.getCreated());
-        return commentDto;
-    }
-
-    public static Comment toComment(CommentDto dto, User author, Item item) {
-        if (dto == null) {
-            return null;
-        }
-        Comment comment = new Comment();
-        comment.setId(dto.getId());
-        comment.setText(dto.getText());
-        comment.setAuthorName(author.getName());
-        comment.setItem(item);
-        comment.setCreated(dto.getCreated());
-        return comment;
     }
 }
