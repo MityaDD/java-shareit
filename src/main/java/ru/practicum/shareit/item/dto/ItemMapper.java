@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingDtoSpecial;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.Comparator;
 import java.util.List;
 
-@Component
+@UtilityClass
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
         if (item == null) {

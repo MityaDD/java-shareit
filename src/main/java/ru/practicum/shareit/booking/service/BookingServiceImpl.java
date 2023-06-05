@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.*;
 import ru.practicum.shareit.booking.storage.BookingStorage;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.NotValidException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -28,7 +27,6 @@ public class BookingServiceImpl implements BookingService {
     private final UserService userService;
     private final ItemService itemService;
     private final BookingStorage bookingStorage;
-    private static final LocalDateTime NOW = LocalDateTime.now();
 
     @Transactional(readOnly = true)
     @Override
@@ -61,10 +59,10 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto setApprovedByOwner(Long userId, Long bookingId, boolean approved) {
         Booking booking = bookingStorage.findBookingOwner(bookingId, userId);
         if (booking == null) {
-            throw new NotFoundException("Booking не найден");
+            Log.andThrowNotFound("Booking не найден");
         }
         if (approved) {
-            if (booking.getStatus().equals(Status.APPROVED)) {
+            if (booking.getStatus() == Status.APPROVED) {
                 Log.andThrowNotValid(String.format("У бронирования с id=%d уже стоит статус APPROVED", bookingId));
             }
             booking.setStatus(Status.APPROVED);
@@ -138,6 +136,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean isNotValidDate(LocalDateTime start, LocalDateTime end) {
-        return start.isBefore(NOW) || end.isBefore(NOW) || end.isBefore(start) || start.equals(end);
+        LocalDateTime now = LocalDateTime.now();
+        return start.isBefore(now) || end.isBefore(now) || end.isBefore(start) || start.equals(end);
     }
 }

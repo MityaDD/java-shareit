@@ -23,7 +23,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto setApprovedByOwner(@PathVariable("bookingId") Long bookingId,
+    public BookingDto setApprovedByOwner(@PathVariable Long bookingId,
                                          @RequestParam("approved") boolean approved,
                                          @RequestHeader(HEADER) Long userId) {
         return bookingService.setApprovedByOwner(userId, bookingId, approved);
