@@ -4,14 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.item.model.Item;
 
-import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ItemRequestDto {
-    @NotBlank(message = "Описание не может быть пустым")
+    private Long id;
     private String description;
+    private LocalDateTime created;
+    private List<Item> items = new ArrayList<>();
 }
