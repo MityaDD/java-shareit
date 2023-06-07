@@ -2,7 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoInput;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -75,12 +77,16 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     @Override
-    public List<BookingDto> getAllBookings(String state, Long userId, String typeUser) {
+    public List<BookingDto> getAllBookings(String state, Long userId, String typeUser, int from, int size) {
         log.info("Запрошен список пользователя с id={} и стейтом={}", userId, typeUser);
         if (state == null) {
             state = "ALL";
         }
-        List<Booking> list = getBookingsList(state, userId, typeUser);
+        if (size <= 0 || from < 0) {
+            Log.andThrowNotValid("size и from должны быть больше 0"); ///////валид
+        }
+        PageRequest pages = PageRequest.of(from > 0 ? from / size : 0, size);
+        List<Booking> list = getBookingsList(state, userId, typeUser, pages);
         log.info("Получен список: {}", list);
         if (list.isEmpty()) {
             Log.andThrowNotFound("Бронирование не найдено");
@@ -90,34 +96,34 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    private List<Booking> getBookingsList(String state, Long userId, String typeUser) {
+    private List<Booking> getBookingsList(String state, Long userId, String typeUser, Pageable pages) {
         LocalDateTime time = LocalDateTime.now();
         String criteria = typeUser + state;
         switch (criteria) {
             case "ownerALL":
-                return bookingStorage.findAllByOwnerIdOrderByStartDesc(userId);
+                return bookingStorage.findAllByOwnerIdOrderByStartDesc(userId, pages);
             case "bookerALL":
-                return bookingStorage.findAllByBookerIdOrderByStartDesc(userId);
+                return bookingStorage.findAllByBookerIdOrderByStartDesc(userId, pages);
             case "ownerFUTURE":
-                return bookingStorage.findAllByOwnerIdAndStartAfterOrderByStartDesc(userId, time);
+                return bookingStorage.findAllByOwnerIdAndStartAfterOrderByStartDesc(userId, time, pages);
             case "bookerFUTURE":
-                return bookingStorage.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, time);
+                return bookingStorage.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, time, pages);
             case "ownerWAITING":
-                return bookingStorage.findAllByOwnerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                return bookingStorage.findAllByOwnerIdAndStatusOrderByStartDesc(userId, Status.WAITING, pages);
             case "bookerWAITING":
-                return bookingStorage.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                return bookingStorage.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING, pages);
             case "ownerCURRENT":
-                return bookingStorage.findAllByOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, time, time);
+                return bookingStorage.findAllByOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, time, time, pages);
             case "bookerCURRENT":
-                return bookingStorage.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, time, time);
+                return bookingStorage.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, time, time, pages);
             case "ownerPAST":
-                return bookingStorage.findAllByOwnerIdAndEndBeforeOrderByStartDesc(userId, time);
+                return bookingStorage.findAllByOwnerIdAndEndBeforeOrderByStartDesc(userId, time, pages);
             case "bookerPAST":
-                return bookingStorage.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, time);
+                return bookingStorage.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, time, pages);
             case "ownerREJECTED":
-                return bookingStorage.findAllByOwnerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+                return bookingStorage.findAllByOwnerIdAndStatusOrderByStartDesc(userId, Status.REJECTED, pages);
             case "bookerREJECTED":
-                return bookingStorage.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+                return bookingStorage.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED, pages);
             default:
                 throw new NotValidException("Unknown state: UNSUPPORTED_STATUS");
         }
