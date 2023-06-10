@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = BookingController.class)
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class BookingControllerLayerTest {
+public class BookingControllerTest {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
@@ -76,7 +76,7 @@ public class BookingControllerLayerTest {
 
     @Test
     @DisplayName("Создаем booking")
-    public void shouldAddBooking() throws Exception {
+    public void addReservation() throws Exception {
         when(bookingService.addBooking(anyLong(), any()))
                 .thenReturn(bookingDto);
 
@@ -99,7 +99,7 @@ public class BookingControllerLayerTest {
 
     @Test
     @DisplayName("Получаем booking по id")
-    public void shouldGetBookingsById() throws Exception {
+    public void getBookingById() throws Exception {
         Integer bookingId = 1;
         Integer userId = 1;
 
@@ -122,7 +122,7 @@ public class BookingControllerLayerTest {
 
     @Test
     @DisplayName("Обновляем booking по пользователю")
-    public void shouldUpdateBookingByUser() throws Exception {
+    public void setApprovedByOwner() throws Exception {
         Integer bookingId = 1;
         Integer userId = 1;
         bookingDto.setStatus(Status.APPROVED);
@@ -174,7 +174,8 @@ public class BookingControllerLayerTest {
         Integer userId = 1;
         bookingDto.setStatus(Status.REJECTED);
 
-        when(bookingService.setApprovedByOwner(anyLong(), anyLong(), anyBoolean())).thenReturn(bookingDto);
+        when(bookingService.setApprovedByOwner(anyLong(), anyLong(), anyBoolean()))
+                .thenReturn(bookingDto);
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=false", bookingId)
                         .header("X-Sharer-User-Id", userId))
@@ -215,7 +216,7 @@ public class BookingControllerLayerTest {
 
     @Test
     @DisplayName("Получаем все booking для OWNER по стейту ALL")
-    public void shouldFindAllBookingsForOwnerALL() throws Exception {
+    public void getAllReservationsByOwnerId() throws Exception {
         Integer userId = 2;
 
         when(bookingService.getAllBookings(anyString(), anyLong(), anyString(), anyInt(), anyInt()))
@@ -226,6 +227,20 @@ public class BookingControllerLayerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    @DisplayName("Получаем все booking для booker по стейту ALL")
+    public void getAllReservationsByUserId() throws Exception {
+        Integer userId = 2;
+
+        when(bookingService.getAllBookings(anyString(), anyLong(), anyString(), anyInt(), anyInt()))
+                .thenReturn(List.of(bookingDto, bookingDto));
+
+        mockMvc.perform(get("/bookings/booker")
+                        .header("X-Sharer-User-Id", userId))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
     }
 
 }

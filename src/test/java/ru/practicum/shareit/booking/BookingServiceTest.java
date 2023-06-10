@@ -169,8 +169,6 @@ class BookingServiceTest {
         assertEquals(booking.getId(), bookingResponseDto.getId());
     }
 
-
-
     @Test
     @DisplayName("Получаем все booking для owner")
     public void testGetAllReserveForOwner() {

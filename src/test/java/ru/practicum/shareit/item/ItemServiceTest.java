@@ -130,6 +130,29 @@ class ItemServiceTest {
     }
 
     @Test
+    @DisplayName("Получаем item по id private-метод")
+    public void shouldGetById() {
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setName("Test User");
+
+        userStorage.save(user);
+
+        Item item = new Item();
+        item.setName("Test Item");
+        item.setDescription("Test Description");
+        item.setAvailable(true);
+        item.setOwner(user);
+        itemStorage.save(item);
+
+        Long itemId = item.getId();
+
+        Item itemGotten = itemService.getById(itemId);
+
+        assertNotNull(itemGotten);
+    }
+
+    @Test
     @DisplayName("Обновляем item")
     public void shouldUpdateItem() {
         User user = new User(1L, "Test User", "test@example.com");

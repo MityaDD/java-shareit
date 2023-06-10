@@ -82,12 +82,25 @@ class UserServiceTest {
     @Test
     @DisplayName("Находим user по id")
     void shouldFindUserById() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
         UserDto userResult = userService.getUserById(1L);
 
         assertThat(userResult.getId(), notNullValue());
-        assertThat(userResult.getName(), equalTo(userResult.getName()));
-        assertThat(userResult.getEmail(), equalTo(userResult.getEmail()));
+        assertEquals(userResult.getName(), "user");
+        assertEquals(userResult.getEmail(), "user@user.com");
+    }
+
+    @Test
+    @DisplayName("Находим user по id private-метод")
+    void shouldFindUser() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+        User user = userService.getById(1L);
+
+        assertThat(user.getId(), notNullValue());
+        assertEquals(user.getName(), "user");
+        assertEquals(user.getEmail(), "user@user.com");
     }
 
     @Test

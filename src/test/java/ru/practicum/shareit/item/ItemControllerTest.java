@@ -11,12 +11,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -30,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = ItemController.class)
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class ItemControllerLayerTest {
+public class ItemControllerTest {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
@@ -38,6 +40,7 @@ public class ItemControllerLayerTest {
     private User owner;
     private Item item;
     private ItemDto itemDto;
+    private CommentDto commentDto;
     private ItemResponseDto itemResponseDto;
     @MockBean
     private ItemService itemService;
@@ -65,12 +68,14 @@ public class ItemControllerLayerTest {
                 .owner(owner)
                 .available(true)
                 .build();
+        commentDto = new CommentDto(null, "Add comment from user2", item, booker.getName(),
+                LocalDateTime.now().plusDays(1).plusMinutes(1));
 
     }
 
     @Test
     @DisplayName("Добавляем item и возвращаем 200.ОК")
-    public void shouldAddItem() throws Exception {
+    public void createItem() throws Exception {
         when(itemService.addItem(anyLong(), any()))
                 .thenReturn(itemDto);
 
@@ -91,7 +96,7 @@ public class ItemControllerLayerTest {
 
     @Test
     @DisplayName("Возвращаем item по id")
-    public void shouldGetItemById() throws Exception {
+    public void getItem() throws Exception {
         Integer itemId = 1;
         Integer userId = 1;
 
@@ -165,7 +170,7 @@ public class ItemControllerLayerTest {
 
     @Test
     @DisplayName("Получаем все item")
-    public void shouldGetItemAll() throws Exception {
+    public void findAll() throws Exception {
         Integer userId = 1;
 
         when(itemService.getAllItemsByUserId(anyLong()))
@@ -183,7 +188,7 @@ public class ItemControllerLayerTest {
 
     @Test
     @DisplayName("Обновляем item")
-    public void shouldItemUpdate() throws Exception {
+    public void updateItem() throws Exception {
         Long itemId = 1L;
         Long userId = 1L;
         String json = objectMapper.writeValueAsString(itemDto);
@@ -206,7 +211,7 @@ public class ItemControllerLayerTest {
 
     @Test
     @DisplayName("Удаляем item")
-    public void shouldDeleteItem() throws Exception {
+    public void removeItem() throws Exception {
         Long userId = 1L;
 
         mockMvc.perform(delete("/items/1")
@@ -216,7 +221,7 @@ public class ItemControllerLayerTest {
 
     @Test
     @DisplayName("Ищем по тегу")
-    public void shouldSearchItemsByDescription() throws Exception {
+    public void searchItems() throws Exception {
         Integer userId = 1;
 
         when(itemService.searchItemsByDescription(anyString()))
@@ -230,5 +235,25 @@ public class ItemControllerLayerTest {
                 .andExpect(jsonPath("$[0].description").value("Простая дрель"))
                 .andExpect(jsonPath("$[0].available").value("true"));
     }
+
+    @Test
+    public void addCommentByItemId() throws Exception {
+        when(itemService.addComment(anyLong(), anyLong(), any()))
+                .thenReturn(commentDto);
+
+        String jsonCommentDto = objectMapper.writeValueAsString(commentDto);
+
+        mockMvc.perform(post("/items/{itemId}/comment", item.getId())
+                        .header("X-Sharer-User-Id", 2L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonCommentDto))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.item.id").value(1))
+                .andExpect(jsonPath("$.item.name").value("Дрель"))
+                .andExpect(jsonPath("$.created").isNotEmpty())
+                .andExpect(jsonPath("$.authorName").value("user"))
+                .andExpect(jsonPath("$.text").value("Add comment from user2"));
+    }
+
 }
 
