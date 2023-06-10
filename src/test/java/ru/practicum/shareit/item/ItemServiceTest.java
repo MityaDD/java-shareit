@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -133,7 +132,7 @@ class ItemServiceTest {
     @Test
     @DisplayName("Обновляем item")
     public void shouldUpdateItem() {
-        User user = new User(1L,"Test User", "test@example.com" );
+        User user = new User(1L, "Test User", "test@example.com");
         userStorage.save(user);
 
         Item item = new Item();
@@ -214,14 +213,13 @@ class ItemServiceTest {
     }
 
 
-
     @Test
     @DisplayName("Тест полей ItemResponseDto")
     public void testItemResponseDto() {
         Long id = 1L;
         String name = "Test Item";
         String description = "Test Description";
-        User owner = new User(2L, "Test Owner","owner@ro.ru");
+        User owner = new User(2L, "Test Owner", "owner@ro.ru");
 
         Boolean available = true;
         Long requestId = 3L;
@@ -246,7 +244,7 @@ class ItemServiceTest {
     @Test
     @DisplayName("Тест полей ItemDto")
     public void testItem() {
-        User owner = new User(2L, "Test Owner","owner@ro.ru");
+        User owner = new User(2L, "Test Owner", "owner@ro.ru");
         Long id = 1L;
         String name = "Test Item";
         String description = "Test Description";
@@ -304,7 +302,7 @@ class ItemServiceTest {
 
         List<Comment> comments = new ArrayList<>();
 
-        User owner2 = new User(2L, "Test Owner","owner@ro.ru");
+        User owner2 = new User(2L, "Test Owner", "owner@ro.ru");
 
         BookingDtoSpecial bookingLastDto = new BookingDtoSpecial();
         bookingLastDto.setId(booking1.getId());

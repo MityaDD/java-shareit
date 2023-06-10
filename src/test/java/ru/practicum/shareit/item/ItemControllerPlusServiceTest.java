@@ -134,10 +134,9 @@ public class ItemControllerPlusServiceTest {
                 .andExpect(status().is(404));
     }
 
-
     @Test
     @DisplayName("Возвращаем item по id")
-    public void GetItemByIdTest() throws Exception {
+    public void getItemByIdTest() throws Exception {
         Integer itemId = 1;
         Integer userId = 1;
 
@@ -248,7 +247,7 @@ public class ItemControllerPlusServiceTest {
                         .content(jsonItem)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         mockMvc.perform(get("/items/{id}", itemId)
                         .header("X-Sharer-User-Id", userId))

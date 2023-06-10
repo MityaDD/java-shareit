@@ -71,7 +71,7 @@ class BookingServiceTest {
         owner = null;
         item = null;
         booker = null;
-        bookingDtoInput= null;
+        bookingDtoInput = null;
     }
 
     @Test
