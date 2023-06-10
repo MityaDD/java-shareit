@@ -36,7 +36,7 @@ public class ItemServiceImpl implements ItemService {
     public Item getById(Long id) {
         Optional<Item> item = itemStorage.findById(id);
         if (!item.isPresent()) {
-            Log.andThrowNotFound(String.format("Предмет с id=%s не найдена.", id));
+            Log.andThrowNotFound(String.format("Не найден предмет с id=%s.", id));
         }
         return item.get();
     }
@@ -115,7 +115,7 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto addComment(Long bookerId, Long itemId, CommentDto commentDto) {
         List<Booking> booking = bookingStorage.findAllByBookerIdAndItemIdAndStatusNotAndStartBefore(bookerId, itemId, Status.REJECTED, LocalDateTime.now());
         if (booking.isEmpty()) {
-            Log.andThrowNotValid("Вы не можете оставить отзыв, т.к. не бронировали вещь");
+            Log.andThrowNotValid("Пользователь не может оставить отзыв, т.к. не бронировал вещь");
         }
         User author = userService.getById(bookerId);
         Item item = getById(itemId);
