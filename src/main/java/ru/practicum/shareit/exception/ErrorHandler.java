@@ -49,5 +49,4 @@ public class ErrorHandler {
         return Map.of("error", e.getMessage());
     }
 
-
 }
