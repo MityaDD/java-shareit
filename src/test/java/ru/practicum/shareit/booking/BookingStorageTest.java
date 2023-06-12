@@ -65,7 +65,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("ownerALL APPROVED")
-    void test_6_findAllByOwnerIdOrderByStartDesc() {
+    void shouldFindAllByOwnerIdOrderByStartDesc() {
         List<Booking> result = bookingStorage.findAllByOwnerIdOrderByStartDesc(
                 user.getId(), PageRequest.of(0,2));
 
@@ -76,7 +76,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("bookerALL APPROVED")
-    void findAllByBookerIdOrderByStartDesc() {
+    void shouldFindAllByBookerIdOrderByStartDesc() {
         List<Booking> result = bookingStorage.findAllByBookerIdOrderByStartDesc(
                 user.getId(), PageRequest.of(0,2));
 
@@ -87,7 +87,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("ownerFUTURE")
-    void findAllByOwnerIdAndStartAfterOrderByStartDesc() {
+    void shouldFindAllByOwnerIdAndStartAfterOrderByStartDesc() {
         List<Booking> result = bookingStorage.findAllByOwnerIdAndStartAfterOrderByStartDesc(
                 user.getId(), timeNow, PageRequest.of(0,2));
 
@@ -97,7 +97,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("bookerFUTURE")
-    void findAllByBookerIdAndStartAfterOrderByStartDesc() {
+    void shouldFindAllByBookerIdAndStartAfterOrderByStartDesc() {
         List<Booking> result = bookingStorage.findAllByBookerIdAndStartAfterOrderByStartDesc(
                 user.getId(), timeNow, PageRequest.of(0,2));
 
@@ -107,7 +107,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("ownerCURRENT")
-    void findAllByOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
+    void shouldFindAllByOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
         List<Booking> result = bookingStorage.findAllByOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                 user.getId(), timeNow, timeNow, PageRequest.of(0,2));
 
@@ -117,7 +117,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("bookerCURRENT")
-    void test_2_findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
+    void shouldFindAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc() {
         List<Booking> result = bookingStorage.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
                 user.getId(), timeNow, timeNow, PageRequest.of(0,2));
 
@@ -127,7 +127,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("ownerPAST")
-    void test_8_findAllByItem_Owner_IdAndEndIsBeforeOrderByStartDesc() {
+    void shouldFindAllByItem_Owner_IdAndEndIsBeforeOrderByStartDesc() {
         List<Booking> result = bookingStorage.findAllByOwnerIdAndEndBeforeOrderByStartDesc(
                 user.getId(), timeNow, PageRequest.of(0,2));
 
@@ -137,7 +137,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("bookerPAST")
-    void test_3_findAllByBookerIdAndEndBeforeOrderByStartDesc() {
+    void shouldFindAllByBookerIdAndEndBeforeOrderByStartDesc() {
         List<Booking> result = bookingStorage.findAllByBookerIdAndEndBeforeOrderByStartDesc(
                 user.getId(), timeNow, PageRequest.of(0,2));
 
@@ -147,7 +147,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("ownerWAITING")
-    void test_10_findAllByItem_Owner_IdAndStatusOrderByStartDesc() {
+    void shouldFindAllByOwnerIdAndStatusOrderByStartDescWAITING() {
         List<Booking> result = bookingStorage.findAllByOwnerIdAndStatusOrderByStartDesc(
                 user.getId(), Status.WAITING, PageRequest.of(0,2));
 
@@ -157,7 +157,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("bookerWAITING")
-    void test_5_findAllByBookerIdAndStatusOrderByStartDesc() {
+    void shouldFindAllByBookerIdAndStatusOrderByStartDescWAITING() {
         List<Booking> result = bookingStorage.findAllByBookerIdAndStatusOrderByStartDesc(
                 user.getId(), Status.WAITING, PageRequest.of(0,2));
 
@@ -167,7 +167,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("ownerREJECTED")
-    void findAllByOwnerIdAndStatusOrderByStartDesc() {
+    void shouldFindAllByOwnerIdAndStatusOrderByStartDescREJECTED() {
         List<Booking> result = bookingStorage.findAllByOwnerIdAndStatusOrderByStartDesc(
                 user.getId(), Status.REJECTED, PageRequest.of(0,2));
 
@@ -177,7 +177,7 @@ class BookingStorageTest {
 
     @Test
     @DisplayName("bookerREJECTED")
-    void findAllByBookerIdAndStatusOrderByStartDesc() {
+    void shouldFindAllByBookerIdAndStatusOrderByStartDescREJECTED() {
         List<Booking> result = bookingStorage.findAllByBookerIdAndStatusOrderByStartDesc(
                 user.getId(), Status.REJECTED, PageRequest.of(0,2));
 

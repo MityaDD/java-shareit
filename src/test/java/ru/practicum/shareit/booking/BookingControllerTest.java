@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.model.Status;
@@ -36,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingControllerTest {
-
+    private static final String HEADER = "X-Sharer-User-Id";
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private User booker;
@@ -83,7 +84,7 @@ public class BookingControllerTest {
         String jsonBooking = objectMapper.writeValueAsString(bookingDtoInput);
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", booker.getId())
+                        .header(HEADER, booker.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBooking))
                 .andExpect(status().isOk())
@@ -99,7 +100,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Получаем booking по id")
-    public void getBookingById() throws Exception {
+    public void shouldReturnOkWhenGetBookingById() throws Exception {
         Integer bookingId = 1;
         Integer userId = 1;
 
@@ -107,7 +108,7 @@ public class BookingControllerTest {
                 .thenReturn(bookingDto);
 
         mockMvc.perform(get("/bookings/{id}", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -122,7 +123,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Обновляем booking по пользователю")
-    public void setApprovedByOwner() throws Exception {
+    public void shouldReturnOkWhenSetApprovedByOwner() throws Exception {
         Integer bookingId = 1;
         Integer userId = 1;
         bookingDto.setStatus(Status.APPROVED);
@@ -131,13 +132,13 @@ public class BookingControllerTest {
                 .thenReturn(bookingDto);
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("APPROVED"));
     }
 
     @Test
-    @DisplayName("Кидает BadRequest, если booking не пользователя")
+    @DisplayName("Кидает NotFound, если booking не пользователя")
     public void shouldUpdateBookingByNoBooker() throws Exception {
         Integer bookingId = 99;
         Integer userId = 1;
@@ -146,8 +147,8 @@ public class BookingControllerTest {
                 .thenThrow(new NotFoundException("Booking не найден"));
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError())
+                        .header(HEADER, userId))
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error", is("Не найден Booking не найден")));
     }
 
@@ -161,8 +162,8 @@ public class BookingControllerTest {
                 .thenThrow(new NotValidException("Статус APPROVED уже установлен"));
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError())
+                        .header(HEADER, userId))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("Статус APPROVED уже установлен")));
 
     }
@@ -178,7 +179,7 @@ public class BookingControllerTest {
                 .thenReturn(bookingDto);
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=false", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("REJECTED"));
 
@@ -186,7 +187,7 @@ public class BookingControllerTest {
 
     @Test
     @DisplayName("Кидает NotFound, если user не найден ")
-    public void shouldTrowEcsWhenUserUnknown() throws Exception {
+    public void shouldTrowNotFoundWhenUserUnknown() throws Exception {
         Integer bookingId = 1;
         Integer userId = 100;
 
@@ -194,8 +195,8 @@ public class BookingControllerTest {
                 .thenThrow(new NotFoundException("Booking не найден"));
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError())
+                        .header(HEADER, userId))
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error", is("Не найден Booking не найден")));
     }
 
@@ -208,7 +209,7 @@ public class BookingControllerTest {
                 .thenReturn(List.of(bookingDto, bookingDto, bookingDto));
 
         mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
@@ -223,7 +224,7 @@ public class BookingControllerTest {
                 .thenReturn(List.of(bookingDto, bookingDto));
 
         mockMvc.perform(get("/bookings/owner")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
@@ -238,7 +239,7 @@ public class BookingControllerTest {
                 .thenReturn(List.of(bookingDto, bookingDto));
 
         mockMvc.perform(get("/bookings/booker")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }

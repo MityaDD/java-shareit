@@ -49,7 +49,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Transactional
     @Override
-    public List<ItemRequestDto> getAllRequestsByOtherUsers(Long userId, Integer from, Integer size) {
+    public List<ItemRequestDto> getAllRequestsByOtherUsers(Long userId, int from, int size) {
         if (size <= 0 || from < 0) {
             Log.andThrowNotValid("size или from должен быть больше 0");
         }
@@ -79,15 +79,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private List<ItemRequestDto> getItemRequestDto(List<ItemRequest> itemRequests) {
-        List<Item> items = itemStorage.findAllByRequestIdIn(
-                itemRequests.stream()
-                        .map(ItemRequest::getId)
-                        .collect(Collectors.toList()));
         return itemRequests.stream()
                 .map(itemRequest -> ItemRequestMapper.toItemRequestDto(
-                        itemRequest, items.stream()
-                                .filter(item -> item.getRequestId().equals(itemRequest.getId()))
-                                .collect(Collectors.toList())))
+                        itemRequest,
+                        itemStorage.findItemsByRequestId(itemRequest.getId())
+                ))
                 .collect(Collectors.toList());
     }
 }

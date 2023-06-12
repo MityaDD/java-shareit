@@ -29,8 +29,8 @@ public class BookingDtoTest {
     @Test
     @DisplayName("BookingDto  1")
     void testBookingDtoInput() throws Exception {
-        LocalDateTime start = LocalDateTime.now().withNano(000000);
-        LocalDateTime end = LocalDateTime.now().withNano(000000).plusDays(1);
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.now().plusDays(1);
 
         BookingDtoInput bookingDtoInputNew = new BookingDtoInput(1L, 1L, start, end, Status.WAITING);
 

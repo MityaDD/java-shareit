@@ -1,6 +1,8 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,22 +37,34 @@ class ItemRequestServiceTest {
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
     private final ItemRequestStorage requestStorage;
+    User user;
+    Item item;
 
-    @Test
-    @DisplayName("Создаем ItemRequest")
-    public void shouldCreateItemRequest() {
-
-        User user = new User();
+    @BeforeEach
+    void setUp() {
+        user = new User();
         user.setEmail("test@test.com");
         user.setName("Test User");
         userStorage.save(user);
 
-        Item item = new Item();
+        item = new Item();
         item.setName("Test Item");
         item.setDescription("Test Description");
         item.setAvailable(true);
         item.setOwner(user);
         itemStorage.save(item);
+    }
+
+    @AfterEach
+    void tearDown() {
+        user = null;
+        item = null;
+    }
+
+
+    @Test
+    @DisplayName("Создаем ItemRequest")
+    public void shouldCreateItemRequest() {
 
         ItemRequestDtoInput itemRequestDtoInput = new ItemRequestDtoInput();
         itemRequestDtoInput.setDescription("Test message");
@@ -67,23 +81,10 @@ class ItemRequestServiceTest {
     @Test
     @DisplayName("Получаем ItemRequest для юзера-риквестера")
     public void shouldGetItemRequestsForUser() {
-
-        User user = new User();
-        user.setEmail("test@test.com");
-        user.setName("Test User");
-        userStorage.save(user);
-
         User requestor = new User();
         requestor.setEmail("requestor@requestor.com");
         requestor.setName("Test requestor");
         userStorage.save(requestor);
-
-        Item item1 = new Item();
-        item1.setName("Item 1");
-        item1.setDescription("Description 1");
-        item1.setAvailable(true);
-        item1.setOwner(user);
-        itemStorage.save(item1);
 
         Item item2 = new Item();
         item2.setName("Item 2");
@@ -91,13 +92,6 @@ class ItemRequestServiceTest {
         item2.setAvailable(true);
         item2.setOwner(user);
         itemStorage.save(item2);
-
-        ItemRequestDtoInput itemRequestDtoInput = ItemRequestDtoInput.builder()
-                .description("Bla bla bla")
-                .build();
-
-        ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDtoInput, user.getId());
-
 
         ItemRequest itemRequest1 = new ItemRequest();
         itemRequest1.setRequester(requestor.getId());
@@ -122,23 +116,10 @@ class ItemRequestServiceTest {
     @Test
     @DisplayName("Получаем риквесты других")
     public void shouldGetOtherUsersItemRequests() {
-
-        User user1 = new User();
-        user1.setEmail("test1@test.com");
-        user1.setName("Test User 1");
-        userStorage.save(user1);
-
         User user2 = new User();
         user2.setEmail("test2@test.com");
         user2.setName("Test User 2");
         userStorage.save(user2);
-
-        Item item1 = new Item();
-        item1.setName("Item 1");
-        item1.setDescription("Description 1");
-        item1.setAvailable(true);
-        item1.setOwner(user1);
-        itemStorage.save(item1);
 
         Item item2 = new Item();
         item2.setName("Item 2");
@@ -146,7 +127,6 @@ class ItemRequestServiceTest {
         item2.setAvailable(true);
         item2.setOwner(user2);
         itemStorage.save(item2);
-
 
         ItemRequest itemRequest1 = new ItemRequest();
         itemRequest1.setRequester(user2.getId());
@@ -160,7 +140,7 @@ class ItemRequestServiceTest {
         itemRequest2.setDescription("New item search number Two");
         requestStorage.save(itemRequest2);
 
-        List<ItemRequestDto> itemRequestResponseDtos = itemRequestService.getAllRequestsByOtherUsers(user1.getId(), 0, 10);
+        List<ItemRequestDto> itemRequestResponseDtos = itemRequestService.getAllRequestsByOtherUsers(user.getId(), 0, 10);
 
         assertNotNull(itemRequestResponseDtos);
         assertNotNull(itemRequestResponseDtos.get(0).getDescription());
@@ -170,19 +150,6 @@ class ItemRequestServiceTest {
     @Test
     @DisplayName("Получаем ItemRequest по id")
     public void shouldGetRequestById() {
-
-        User user = new User();
-        user.setEmail("test@test.com");
-        user.setName("Test User");
-        userStorage.save(user);
-
-        Item item = new Item();
-        item.setName("Test Item");
-        item.setDescription("Test Description");
-        item.setAvailable(true);
-        item.setOwner(user);
-        itemStorage.save(item);
-
         ItemRequest itemRequest = new ItemRequest();
         itemRequest.setRequester(user.getId());
         itemRequest.setCreated(LocalDateTime.now());

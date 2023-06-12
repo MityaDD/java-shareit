@@ -31,19 +31,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ItemControllerPlusServiceTest {
-
+    private static final String HEADER = "X-Sharer-User-Id";
     private final MockMvc mockMvc;
-
     private final ObjectMapper objectMapper;
-
-    private final ItemService service;
     private User user;
 
     @BeforeEach
     public void setUp() throws Exception {
         user = new User(1L, "user", "user@user.com");
         String jsonUser = objectMapper.writeValueAsString(user);
-
 
         mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -54,7 +50,7 @@ public class ItemControllerPlusServiceTest {
 
         Long userId = 1L;
         mockMvc.perform(post("/items")
-                .header("X-Sharer-User-Id", userId)
+                .header(HEADER, userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonItem));
     }
@@ -66,7 +62,7 @@ public class ItemControllerPlusServiceTest {
         ItemDto itemDto = new ItemDto(1L, "Дрель", "Простая дрель", user, true, null);
         mockMvc.perform(post("/items")
                         .content(objectMapper.writeValueAsString(itemDto))
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -84,7 +80,7 @@ public class ItemControllerPlusServiceTest {
         ItemDto itemDto = new ItemDto(1L, "Дрель", "", user, true, null);
         mockMvc.perform(post("/items")
                         .content(objectMapper.writeValueAsString(itemDto))
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));
@@ -97,7 +93,7 @@ public class ItemControllerPlusServiceTest {
         ItemDto itemDto = new ItemDto(1L, "Дрель00000", "Простая дрель0000", user, true, null);
         mockMvc.perform(post("/items")
                         .content(objectMapper.writeValueAsString(itemDto))
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(404));
@@ -110,7 +106,7 @@ public class ItemControllerPlusServiceTest {
         ItemDto itemDto = new ItemDto(1L, "Дрель", "Простая дрель", user, true, null);
         mockMvc.perform(patch("/items/1")
                         .content(objectMapper.writeValueAsString(itemDto))
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -128,7 +124,7 @@ public class ItemControllerPlusServiceTest {
         ItemDto itemDto = new ItemDto(1L, "Дрель", "Простая дрель", user, true, null);
         mockMvc.perform(patch("/items/1")
                         .content(objectMapper.writeValueAsString(itemDto))
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(404));
@@ -141,7 +137,7 @@ public class ItemControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/items/{id}", itemId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -170,10 +166,10 @@ public class ItemControllerPlusServiceTest {
         Long userId = 999L;
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -184,10 +180,10 @@ public class ItemControllerPlusServiceTest {
         Long userId = 2L;
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -198,10 +194,10 @@ public class ItemControllerPlusServiceTest {
         Long userId = 2L;
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -213,10 +209,10 @@ public class ItemControllerPlusServiceTest {
         String jsonItem = objectMapper.writeValueAsString(item);
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -227,10 +223,10 @@ public class ItemControllerPlusServiceTest {
         Long userId = 2L;
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -243,14 +239,14 @@ public class ItemControllerPlusServiceTest {
         String jsonItem = objectMapper.writeValueAsString(newItem);
 
         mockMvc.perform(patch("/items/{id}", itemId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .content(jsonItem)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/items/{id}", itemId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -268,7 +264,7 @@ public class ItemControllerPlusServiceTest {
         mockMvc.perform(patch("/items/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -282,7 +278,7 @@ public class ItemControllerPlusServiceTest {
                         .header("X-Sharer-User-Id", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -296,7 +292,7 @@ public class ItemControllerPlusServiceTest {
         String jsonItem = objectMapper.writeValueAsString(newInput);
 
         mockMvc.perform(patch("/items/{id}", itemId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .content(jsonItem)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -319,7 +315,7 @@ public class ItemControllerPlusServiceTest {
         Long userId = 1L;
 
         mockMvc.perform(patch("/items/1")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
                 .andExpect(jsonPath("$.name").value("Дрель"))
@@ -334,7 +330,7 @@ public class ItemControllerPlusServiceTest {
         Long userId = 1L;
 
         mockMvc.perform(patch("/items/1")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
                 .andExpect(jsonPath("$.name").value("Аккумуляторная дрель"))
@@ -359,13 +355,13 @@ public class ItemControllerPlusServiceTest {
         Long userIdNew = 2L;
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userIdNew)
+                        .header(HEADER, userIdNew)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", userIdNew))
+                        .header(HEADER, userIdNew))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(2))
                 .andExpect(jsonPath("$[0].name").value("Дрель+"))
@@ -384,14 +380,13 @@ public class ItemControllerPlusServiceTest {
         String jsonItem = objectMapper.writeValueAsString(item);
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
                 .andExpect(status().isOk());
 
-
         mockMvc.perform(get("/items/search?text=" + text)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(2))
                 .andExpect(jsonPath("$[0].name").value("Дрель+"))
@@ -410,14 +405,13 @@ public class ItemControllerPlusServiceTest {
         String jsonItem = objectMapper.writeValueAsString(item);
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
                 .andExpect(status().isOk());
 
-
         mockMvc.perform(get("/items/search?text=" + text)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -441,14 +435,13 @@ public class ItemControllerPlusServiceTest {
         String jsonItem = objectMapper.writeValueAsString(item);
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
                 .andExpect(status().isOk());
 
-
         mockMvc.perform(get("/items/search?text=" + text)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
 
@@ -462,21 +455,20 @@ public class ItemControllerPlusServiceTest {
         Item item = new Item(2L, "Дрель+", "Аккумуляторная дрель", user, false, null);
         String jsonItem = objectMapper.writeValueAsString(item);
 
-
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
                 .andExpect(status().isOk());
 
         mockMvc.perform(delete("/items/{id}", 2L)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/items/{id}", 2L)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
 
     }
 

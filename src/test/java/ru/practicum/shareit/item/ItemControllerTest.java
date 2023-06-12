@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ItemControllerTest {
-
+    private static final String HEADER = "X-Sharer-User-Id";
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private User booker;
@@ -75,14 +75,14 @@ public class ItemControllerTest {
 
     @Test
     @DisplayName("Добавляем item и возвращаем 200.ОК")
-    public void createItem() throws Exception {
+    public void shouldCreateItem() throws Exception {
         when(itemService.addItem(anyLong(), any()))
                 .thenReturn(itemDto);
 
         String json = objectMapper.writeValueAsString(itemDto);
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", owner.getId())
+                        .header(HEADER, owner.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -96,7 +96,7 @@ public class ItemControllerTest {
 
     @Test
     @DisplayName("Возвращаем item по id")
-    public void getItem() throws Exception {
+    public void shouldReturnOkAndGetItem() throws Exception {
         Integer itemId = 1;
         Integer userId = 1;
 
@@ -104,7 +104,7 @@ public class ItemControllerTest {
                 .thenReturn(itemResponseDto);
 
         mockMvc.perform(get("/items/{id}", itemId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -122,7 +122,7 @@ public class ItemControllerTest {
         mockMvc.perform(post("/items")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -133,10 +133,10 @@ public class ItemControllerTest {
         Long userId = 2L;
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -147,10 +147,10 @@ public class ItemControllerTest {
         Long userId = 2L;
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -162,22 +162,22 @@ public class ItemControllerTest {
         Long userId = 2L;
 
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Получаем все item")
-    public void findAll() throws Exception {
+    public void shouldFindAllItems() throws Exception {
         Integer userId = 1;
 
         when(itemService.getAllItemsByUserId(anyLong()))
                 .thenReturn(List.of(itemResponseDto, itemResponseDto, itemResponseDto));
 
         mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
@@ -188,7 +188,7 @@ public class ItemControllerTest {
 
     @Test
     @DisplayName("Обновляем item")
-    public void updateItem() throws Exception {
+    public void shouldUpdateItemAndReturnOk() throws Exception {
         Long itemId = 1L;
         Long userId = 1L;
         String json = objectMapper.writeValueAsString(itemDto);
@@ -199,7 +199,7 @@ public class ItemControllerTest {
         itemDto.setName("Дрель+");
 
         mockMvc.perform(patch("/items/{id}", itemId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -211,24 +211,24 @@ public class ItemControllerTest {
 
     @Test
     @DisplayName("Удаляем item")
-    public void removeItem() throws Exception {
+    public void shouldRemoveItem() throws Exception {
         Long userId = 1L;
 
         mockMvc.perform(delete("/items/1")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Ищем по тегу")
-    public void searchItems() throws Exception {
+    public void shouldFindItemsByDescription() throws Exception {
         Integer userId = 1;
 
         when(itemService.searchItemsByDescription(anyString()))
                 .thenReturn(List.of(itemDto, itemDto));
 
         mockMvc.perform(get("/items/search?text=дрель")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name").value("Дрель"))
@@ -237,14 +237,14 @@ public class ItemControllerTest {
     }
 
     @Test
-    public void addCommentByItemId() throws Exception {
+    public void shouldAddCommentByItemId() throws Exception {
         when(itemService.addComment(anyLong(), anyLong(), any()))
                 .thenReturn(commentDto);
 
         String jsonCommentDto = objectMapper.writeValueAsString(commentDto);
 
         mockMvc.perform(post("/items/{itemId}/comment", item.getId())
-                        .header("X-Sharer-User-Id", 2L)
+                        .header(HEADER, 2L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonCommentDto))
                 .andExpect(status().isOk())

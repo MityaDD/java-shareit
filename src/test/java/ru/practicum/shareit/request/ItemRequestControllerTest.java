@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ItemRequestControllerTest {
-
+    private static final String HEADER = "X-Sharer-User-Id";
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private User user;
@@ -42,6 +42,7 @@ public class ItemRequestControllerTest {
     private ItemRequestDto itemResponse;
     @MockBean
     private ItemRequestService itemRequestService;
+    private static final Long USER_ID = 1L;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -64,13 +65,12 @@ public class ItemRequestControllerTest {
     public void tryAddItemRequestWithEmptyDescription() throws Exception {
         ItemRequestDtoInput item = new ItemRequestDtoInput(null);
         String jsonItem = objectMapper.writeValueAsString(item);
-        Long userId = 1L;
 
         mockMvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -78,19 +78,18 @@ public class ItemRequestControllerTest {
     @DisplayName("Кидаем exc, если нет user")
     public void tryGetItemRequestWithoutUser() throws Exception {
         mockMvc.perform(get("/requests"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
 
     @Test
     @DisplayName("Получаем ItemRequest в виде пустого списка, если риквеста не было")
     public void shouldGetItemRequestWithoutRequest() throws Exception {
-        Long userId = 1L;
         when(itemRequestService.getAllRequestsByOwner(anyLong()))
                 .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/requests")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -98,12 +97,11 @@ public class ItemRequestControllerTest {
     @Test
     @DisplayName("Получаем ItemRequest в виде пустого списка, если не заданы from, size")
     public void shouldGetItemRequestWithoutPaginationParams() throws Exception {
-        Long userId = 1L;
         when(itemRequestService.getAllRequestsByOwner(anyLong()))
                 .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/requests/all")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -111,42 +109,35 @@ public class ItemRequestControllerTest {
     @Test
     @DisplayName("Кидаем exc, если нет from, size=0")
     public void tryGetItemRequestWithFrom0Size0() throws Exception {
-        Long userId = 1L;
-
         mockMvc.perform(get("/requests/all?from=0&size=0")
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError());
+                        .header(HEADER, USER_ID))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Кидаем exc, если нет from отрицательное")
     public void tryGetItemRequestWithFromMinSize20() throws Exception {
-        Long userId = 1L;
-
         mockMvc.perform(get("/requests/all?from=-1&size=20")
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError());
+                        .header(HEADER, USER_ID))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Кидаем exc, если нет size отрицательное")
     public void tryGetItemRequestWithFrom0SizeMin() throws Exception {
-        Long userId = 1L;
-
         mockMvc.perform(get("/requests/all?from=0&size=-1")
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError());
+                        .header(HEADER, USER_ID))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Получаем ItemRequest для from=0 и size=20")
     public void shouldGetItemRequestWithFrom0Size20() throws Exception {
-        Long userId = 1L;
         when(itemRequestService.getAllRequestsByOtherUsers(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemResponse));
 
         mockMvc.perform(get("/requests/all?from=0&size=20")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
     }
@@ -155,13 +146,12 @@ public class ItemRequestControllerTest {
     @DisplayName("Добавляем ItemRequest")
     public void shouldAddItemRequest() throws Exception {
         String jsonItem = objectMapper.writeValueAsString(itemResponse);
-        Long userId = 1L;
 
         when(itemRequestService.addRequest(any(), anyLong()))
                 .thenReturn(itemResponse);
 
         mockMvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(HEADER, USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonItem))
                 .andExpect(status().isOk())
@@ -177,7 +167,7 @@ public class ItemRequestControllerTest {
                 .thenReturn(itemResponse);
 
         mockMvc.perform(get("/requests/{requestId}", 1L)
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(HEADER, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.description").value("Хотел бы взять дрель"))

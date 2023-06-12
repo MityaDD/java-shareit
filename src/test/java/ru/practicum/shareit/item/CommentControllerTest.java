@@ -30,15 +30,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class CommentControllerTest {
-
+    private static final String HEADER = "X-Sharer-User-Id";
     private final MockMvc mockMvc;
-
     private final ObjectMapper objectMapper;
-
     @MockBean
     private ItemService itemService;
-
-
     private User booker;
     private User owner;
     private Item item;
@@ -81,7 +77,7 @@ public class CommentControllerTest {
         String jsonCommentDto = objectMapper.writeValueAsString(commentDto);
 
         mockMvc.perform(post("/items/{itemId}/comment", item.getId())
-                        .header("X-Sharer-User-Id", booker.getId())
+                        .header(HEADER, booker.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonCommentDto))
                 .andExpect(status().isOk())
@@ -104,10 +100,10 @@ public class CommentControllerTest {
         String jsonCommentDto = objectMapper.writeValueAsString(commentDto);
 
         mockMvc.perform(post("/items/{itemId}/comment", item.getId())
-                        .header("X-Sharer-User-Id", booker.getId())
+                        .header(HEADER, booker.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonCommentDto))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -119,9 +115,9 @@ public class CommentControllerTest {
         String jsonCommentDto = objectMapper.writeValueAsString(commentDto);
 
         mockMvc.perform(post("/items/{itemId}/comment", -1)
-                        .header("X-Sharer-User-Id", booker.getId())
+                        .header(HEADER, booker.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonCommentDto))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 }

@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingControllerPlusServiceTest {
+    private static final String HEADER = "X-Sharer-User-Id";
     private final MockMvc mockMvc;
 
     private final ObjectMapper objectMapper;
@@ -34,7 +35,6 @@ public class BookingControllerPlusServiceTest {
     private User booker;
     private User owner;
 
-    private BookingDto bookingDto;
     private BookingDtoInput bookingInput;
     LocalDateTime start;
     LocalDateTime end;
@@ -62,7 +62,7 @@ public class BookingControllerPlusServiceTest {
 
         Long userId = 1L;
         mockMvc.perform(post("/items")
-                .header("X-Sharer-User-Id", userId)
+                .header(HEADER, userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonItem));
 
@@ -75,7 +75,7 @@ public class BookingControllerPlusServiceTest {
         String jsonBooking = objectMapper.writeValueAsString(bookingInput);
 
         mockMvc.perform(post("/bookings")
-                .header("X-Sharer-User-Id", bookerId)
+                .header(HEADER, bookerId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonBooking));
     }
@@ -88,7 +88,7 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/{id}", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
@@ -103,7 +103,7 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/bookings/{id}", bookingId)
@@ -114,14 +114,14 @@ public class BookingControllerPlusServiceTest {
     }
 
     @Test
-    @DisplayName("Кидает BadRequest, если booking не пользователя")
+    @DisplayName("Кидает NotFound, если booking не пользователя")
     public void shouldUpdateBookingByNoBooker() throws Exception {
         Integer bookingId = 99;
         Integer userId = 1;
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError());
+                        .header(HEADER, userId))
+                .andExpect(status().isNotFound());
 
     }
 
@@ -132,12 +132,12 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk());
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=true", bookingId)
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError());
+                        .header(HEADER, userId))
+                .andExpect(status().isBadRequest());
 
     }
 
@@ -148,11 +148,11 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(patch("/bookings/{bookingId}?approved=false", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/bookings/{id}", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("REJECTED"));
@@ -167,9 +167,9 @@ public class BookingControllerPlusServiceTest {
 
 
         mockMvc.perform(get("/bookings/{id}", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -179,9 +179,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/{id}", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -191,7 +191,7 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 2;
 
         mockMvc.perform(get("/bookings", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
@@ -204,7 +204,7 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 2;
 
         mockMvc.perform(get("/bookings?state=FUTURE", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
@@ -217,7 +217,7 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 2;
 
         mockMvc.perform(get("/bookings?state=WAITING", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
@@ -230,9 +230,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 2;
 
         mockMvc.perform(get("/bookings?state=REJECTED", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
 
@@ -243,7 +243,7 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
@@ -256,7 +256,7 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner?state=FUTURE", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
@@ -269,7 +269,7 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner?state=WAITING", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
     }
@@ -281,8 +281,8 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner?state=REJECTED", bookingId)
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().is4xxClientError());
+                        .header(HEADER, userId))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -292,9 +292,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 2;
 
         mockMvc.perform(get("/bookings?state=PAST", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -304,9 +304,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 2;
 
         mockMvc.perform(get("/bookings?state=CURRENT", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -316,9 +316,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner?state=PAST", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -328,9 +328,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner?state=CURRENT", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -340,9 +340,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner?state=PASTPast", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -357,10 +357,10 @@ public class BookingControllerPlusServiceTest {
         String jsonBooking = objectMapper.writeValueAsString(bookingInput);
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", bookerId)
+                        .header(HEADER, bookerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBooking))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -373,10 +373,10 @@ public class BookingControllerPlusServiceTest {
         String jsonBooking = objectMapper.writeValueAsString(bookingInput);
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", bookerId)
+                        .header(HEADER, bookerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBooking))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -393,7 +393,7 @@ public class BookingControllerPlusServiceTest {
 
         Long userId = 1L;
         mockMvc.perform(post("/items")
-                .header("X-Sharer-User-Id", userId)
+                .header(HEADER, userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonItem));
 
@@ -401,10 +401,10 @@ public class BookingControllerPlusServiceTest {
         String jsonBooking = objectMapper.writeValueAsString(bookingInput);
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", bookerId)
+                        .header(HEADER, bookerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBooking))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -419,10 +419,10 @@ public class BookingControllerPlusServiceTest {
         String jsonBooking = objectMapper.writeValueAsString(bookingInput);
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", bookerId)
+                        .header(HEADER, bookerId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBooking))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -432,9 +432,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner?size=-1&from=0", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -444,9 +444,9 @@ public class BookingControllerPlusServiceTest {
         Integer userId = 1;
 
         mockMvc.perform(get("/bookings/owner?size=10&from=-1", bookingId)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(HEADER, userId))
                 .andDo(print())
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 }
 
