@@ -28,4 +28,5 @@ public class ItemResponseDto {
     private BookingDtoSpecial lastBooking;
     private BookingDtoSpecial nextBooking;
     private List<Comment> comments;
+    private Long requestId;
 }

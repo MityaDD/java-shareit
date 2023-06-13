@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.storage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 
@@ -31,9 +32,9 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "JOIN b.item AS i " +
             "WHERE i.owner.id = ?1 " +
             "ORDER BY b.start DESC ")
-    List<Booking> findAllByOwnerIdOrderByStartDesc(Long bookerId);
+    List<Booking> findAllByOwnerIdOrderByStartDesc(Long bookerId, Pageable pages);
 
-    List<Booking> findAllByBookerIdOrderByStartDesc(Long bookerId);
+    List<Booking> findAllByBookerIdOrderByStartDesc(Long bookerId, Pageable pages);
 
     // FUTURE
     @Query("SELECT b " +
@@ -42,9 +43,9 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "WHERE i.owner.id = ?1 " +
             "AND b.start > ?2 " +
             "ORDER BY b.start DESC ")
-    List<Booking> findAllByOwnerIdAndStartAfterOrderByStartDesc(Long bookerId, LocalDateTime time);
+    List<Booking> findAllByOwnerIdAndStartAfterOrderByStartDesc(Long bookerId, LocalDateTime time, Pageable pages);
 
-    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(Long bookerId, LocalDateTime time);
+    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(Long bookerId, LocalDateTime time, Pageable pages);
 
     // WAITING and REJECTED
     @Query("SELECT b " +
@@ -53,9 +54,9 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "WHERE i.owner.id = ?1 " +
             "AND b.status = ?2 " +
             "ORDER BY b.start DESC ")
-    List<Booking> findAllByOwnerIdAndStatusOrderByStartDesc(Long bookerId, Status status);
+    List<Booking> findAllByOwnerIdAndStatusOrderByStartDesc(Long bookerId, Status status, Pageable pages);
 
-    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(Long bookerId, Status status);
+    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(Long bookerId, Status status, Pageable pages);
 
     // CURRENT
     @Query("SELECT b " +
@@ -64,9 +65,9 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "WHERE i.owner.id = ?1 " +
             "AND b.start < ?2 AND b.end > ?2 " +
             "ORDER BY b.start DESC ")
-    List<Booking> findAllByOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(Long bookerId, LocalDateTime time, LocalDateTime time2);
+    List<Booking> findAllByOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(Long bookerId, LocalDateTime time, LocalDateTime time2, Pageable pages);
 
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(Long bookerId, LocalDateTime time, LocalDateTime time2);
+    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(Long bookerId, LocalDateTime time, LocalDateTime time2, Pageable pages);
 
     // PAST
     @Query("SELECT b " +
@@ -75,9 +76,9 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "WHERE i.owner.id = ?1 " +
             "AND b.end < ?2 " +
             "ORDER BY b.start DESC ")
-    List<Booking> findAllByOwnerIdAndEndBeforeOrderByStartDesc(Long bookerId, LocalDateTime time);
+    List<Booking> findAllByOwnerIdAndEndBeforeOrderByStartDesc(Long bookerId, LocalDateTime time, Pageable pages);
 
-    List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(Long bookerId, LocalDateTime time);
+    List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(Long bookerId, LocalDateTime time, Pageable pages);
 
     @Query("SELECT b " +
             "FROM Booking AS b " +

@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
     private void validateId(Long userId) {
         if (!userStorage.existsById(userId)) {
-            Log.andThrowNotFound("Не найден пользователь c id " + userId);
+            Log.andThrowNotFound("Не найден пользователь c id=" + userId);
         }
     }
 

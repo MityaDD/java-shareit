@@ -28,4 +28,9 @@ public class Comment {
     private String authorName;
     @Column(name = "created")
     private LocalDateTime created;
+
+    // for tests
+    public Comment(String text) {
+        this.text = text;
+    }
 }
