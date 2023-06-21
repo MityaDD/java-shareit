@@ -20,7 +20,7 @@ import ru.practicum.gateway.exception.UnsupportedStateException;
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/bookings")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PUBLIC)
 public class BookingController {
     final BookingClient client;
     private static final String HEADER = "X-Sharer-User-Id";
@@ -34,7 +34,7 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     ResponseEntity<Object> setApprovedByOwner(@PathVariable @Min(1) Long bookingId,
-                                              @RequestParam("approved") boolean approved,
+                                              @RequestParam boolean approved,
                                               @RequestHeader(HEADER) @Min(1) Long userId) {
         return client.setApprovedByOwner(userId, bookingId, approved);
     }

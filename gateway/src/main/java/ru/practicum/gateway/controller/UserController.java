@@ -13,7 +13,7 @@ import ru.practicum.gateway.dto.Validated.*;
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PUBLIC)
 public class UserController {
     final UserClient userClient;
 

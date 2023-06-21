@@ -20,7 +20,7 @@ import javax.validation.constraints.Positive;
 @RequestMapping("/items")
 @Validated
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PUBLIC)
 public class ItemController {
     private static final String HEADER = "X-Sharer-User-Id";
     final ItemClient client;
