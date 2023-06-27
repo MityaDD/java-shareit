@@ -18,31 +18,31 @@ import javax.validation.constraints.PositiveOrZero;
 @RequestMapping(path = "/requests")
 @Validated
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PUBLIC)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemRequestController {
     private static final String HEADER = "X-Sharer-User-Id";
     final RequestClient client;
 
     @PostMapping
-    ResponseEntity<Object> addRequest(@Valid @RequestBody ItemRequestDtoInput dto,
+    public ResponseEntity<Object> addRequest(@Valid @RequestBody ItemRequestDtoInput dto,
                                       @RequestHeader(HEADER) @NotNull Long userId) {
         return client.createRequest(userId, dto);
     }
 
     @GetMapping
-    ResponseEntity<Object> getAllRequestsByOwner(@RequestHeader(HEADER) @NotNull Long userId) {
+    public ResponseEntity<Object> getAllRequestsByOwner(@RequestHeader(HEADER) @NotNull Long userId) {
         return client.getUserRequests(userId);
     }
 
     @GetMapping("/all")
-    ResponseEntity<Object> getAllRequestsByOtherUsers(@RequestHeader(HEADER) @NotNull Long userId,
+    public ResponseEntity<Object> getAllRequestsByOtherUsers(@RequestHeader(HEADER) @NotNull Long userId,
                                                       @RequestParam(defaultValue = "0") @PositiveOrZero int from,
                                                       @RequestParam(defaultValue = "10") @Positive int size) {
         return client.getAllRequests(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
-    ResponseEntity<Object> getRequestById(@RequestHeader(HEADER) @NotNull Long userId,
+    public ResponseEntity<Object> getRequestById(@RequestHeader(HEADER) @NotNull Long userId,
                                           @PathVariable Long requestId) {
         return client.getRequestById(userId, requestId);
     }

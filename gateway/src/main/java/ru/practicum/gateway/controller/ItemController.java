@@ -20,30 +20,30 @@ import javax.validation.constraints.Positive;
 @RequestMapping("/items")
 @Validated
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PUBLIC)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemController {
     private static final String HEADER = "X-Sharer-User-Id";
     final ItemClient client;
 
     @PostMapping()
-    ResponseEntity<Object> createItem(@RequestHeader(HEADER) @Min(1) Long userId,
+    public ResponseEntity<Object> createItem(@RequestHeader(HEADER) @Min(1) Long userId,
                                       @Validated(Create.class) @RequestBody ItemDto itemDto) {
         return client.createItem(userId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    ResponseEntity<Object> getItem(@PathVariable Long itemId, @RequestHeader(HEADER) @Min(1) Long userId) {
+    public ResponseEntity<Object> getItem(@PathVariable Long itemId, @RequestHeader(HEADER) @Min(1) Long userId) {
         return client.getItemById(userId, itemId);
     }
 
     @PatchMapping("/{itemId}")
-    ResponseEntity<Object> updateItem(@RequestHeader(HEADER) @Min(1) Long userId, @PathVariable @Min(1) Long itemId,
+    public ResponseEntity<Object> updateItem(@RequestHeader(HEADER) @Min(1) Long userId, @PathVariable @Min(1) Long itemId,
                                       @Validated(Update.class) @RequestBody ItemDto itemDto) {
         return client.updateItem(userId, itemId, itemDto);
     }
 
     @GetMapping("/search")
-    ResponseEntity<Object> searchItems(@RequestParam("text") String text) {
+    public ResponseEntity<Object> searchItems(@RequestParam("text") String text) {
         return client.searchItemsByDescription(text);
     }
 
@@ -53,12 +53,12 @@ public class ItemController {
     }
 
     @GetMapping()
-    ResponseEntity<Object> findAll(@RequestHeader(HEADER) @Min(1) Long userId) {
+    public ResponseEntity<Object> findAll(@RequestHeader(HEADER) @Min(1) Long userId) {
         return client.getAllItemsByUserId(userId);
     }
 
     @PostMapping("/{itemId}/comment")
-    ResponseEntity<Object> addCommentByItemId(@RequestHeader(HEADER) @NotNull Long userId,
+    public ResponseEntity<Object> addCommentByItemId(@RequestHeader(HEADER) @NotNull Long userId,
                                          @PathVariable("itemId") @Positive Long itemId,
                                          @Valid @RequestBody CommentDto commentDto) {
         return client.commentItem(userId, itemId, commentDto);

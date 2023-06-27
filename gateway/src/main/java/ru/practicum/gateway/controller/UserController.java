@@ -13,33 +13,33 @@ import ru.practicum.gateway.dto.Validated.*;
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PUBLIC)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserController {
     final UserClient userClient;
 
     @GetMapping("{id}")
-    ResponseEntity<Object> getUserById(@PathVariable Long id) {
+    public ResponseEntity<Object> getUserById(@PathVariable Long id) {
         return userClient.getUserById(id);
     }
 
     @GetMapping
-    ResponseEntity<Object> getAllUsers() {
+    public ResponseEntity<Object> getAllUsers() {
         return userClient.getAllUsers();
     }
 
     @PostMapping
-    ResponseEntity<Object> addUser(@RequestBody @Validated(Create.class) UserDto userDto) {
+    public ResponseEntity<Object> addUser(@RequestBody @Validated(Create.class) UserDto userDto) {
         return userClient.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
-    ResponseEntity<Object> updateUser(@PathVariable Long userId,
+    public ResponseEntity<Object> updateUser(@PathVariable Long userId,
                               @RequestBody @Validated(Update.class) UserDto userDto) {
         return userClient.updateUser(userId, userDto);
     }
 
     @DeleteMapping("{id}")
-    void deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable Long id) {
         userClient.deleteUser(id);
     }
 }
